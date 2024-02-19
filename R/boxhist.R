@@ -6,7 +6,7 @@
 #' @param df a data frame
 #' @param ... passes extra arguments to the function
 #'
-#' @importFrom ggplot2 ggplot geom_hist geom_boxplot
+#' @importFrom ggplot2 ggplot geom_histogram geom_boxplot layer_data
 #' @importFrom dplyr select select_if %>%
 #' @importFrom graphics boxplot
 #'
@@ -54,13 +54,28 @@ boxhist <- function(df, ...) {
   #  )
 
 
+  # Plots
+  x <- NULL
+  pbase <- ggplot(df_num, mapping = aes(x = .data[[x]]))
+
+  pb <- pbase +
+    geom_boxplot(...)
+
+  print(pb)
+
+  out <- layer(pb)
+  possibleout <- out$outliers
+
+
 
   list(taildata = taildata,
        n_char = n_char,
        n_num = n_num,
        df_num = df_num,
        df_char = df_char,
-       data = df)
+       data = df,
+       pb = pb
+       )
 
 }
 
