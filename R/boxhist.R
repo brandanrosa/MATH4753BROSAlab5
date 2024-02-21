@@ -6,9 +6,10 @@
 #' @param df a data frame
 #' @param ... passes extra arguments to the function
 #'
-#' @importFrom ggplot2 ggplot geom_histogram geom_boxplot layer_data aes_
+#' @importFrom ggplot2 ggplot geom_histogram geom_boxplot layer_data aes
 #' @importFrom dplyr select select_if %>%
 #' @importFrom graphics boxplot
+#' @importFrom patchwork /
 #'
 #' @return two dfs and plots
 #' @export
@@ -47,19 +48,11 @@ boxhist <- function(df, ...) {
   # Plots
   col <- names(df_num[c(1:n_num)])
 
-  boxl <- lapply(col, function(yvar){
-    ggplot(df_num) +
-      aes_(x = as.name(yvar)) +
-      geom_boxplot()
-  })
-
-  histl <- lapply(col, function(yvar){
-    ggplot(df_num) +
-      aes_(x = as.name(yvar)) +
-      geom_histogram()
-  })
-
-  boxhl <- list(boxl, histl)
+  boxhl <- lapply(col, function(x) ((df_num %>%
+                                       ggplot() + geom_boxplot(aes(x = .data[[x]])))
+                                    /(df_num %>%
+                                        ggplot() +
+                                        geom_histogram(aes(.data[[x]])))))
 
   message(paste0("Number of quantitative variables = ", n_num))
   message(paste0("Number of qualitative  variables = ", n_char))
@@ -73,5 +66,4 @@ boxhist <- function(df, ...) {
        df_char = df_char,
        data = df),
   class = "boxhist")
-
 }
