@@ -16,11 +16,13 @@
 #'
 #' @examples
 #' \dontrun{boxhist(df = ddt)}
-#'
 boxhist <- function(df, ...) {
 
   # Order DF Alphabetically
-  x <- NULL
+  .data <- NULL
+  inout <- NULL
+  z <- NULL
+  zout <- NULL
 
   df <- df %>%
     select(order(colnames(df)))
@@ -40,51 +42,36 @@ boxhist <- function(df, ...) {
   # BP taildata for outlier detection
 
   box_dat <- boxplot(df_num, plot = FALSE)
-  taildata <- box_dat$out
-
-  # DFNew Stuff
-  #dfnew <- df_num %>%
-  # mutate(z = scale(.data[[x]]),
-  #   inout = if_else(is.element(.data[[x]], taildata[[1]]), "out", "in")
-  # )
-
-  # Z-Transform Method for outlier detection
-  # possibleout <- lapply(df_num, FUN = function(x, k=2){
-  #zx <- scale(df_num)
-  #zpos <- df_num[abs(zx) >= 2 & abs(zx) <= 3]
-  #zout <- df_num[abs(zx) > 3]
-  #zin <- mean(df_num) + c(-1, 1)*k*sd(df_num)
-  #}
-  #  )
+  outliers <- box_dat$out
 
   # Plots
-  cols <- names(df_num[c(1:4)])
+  col <- names(df_num[c(1:n_num)])
 
-  box <- lapply(cols, function(yvar){
+  boxl <- lapply(col, function(yvar){
     ggplot(df_num) +
       aes_(x = as.name(yvar)) +
       geom_boxplot()
   })
 
-
-  histo <- lapply(cols, function(yvar){
+  histl <- lapply(col, function(yvar){
     ggplot(df_num) +
       aes_(x = as.name(yvar)) +
       geom_histogram()
   })
 
-  box_patch <- lapply(cols, box)
-  histo_patch <- lapply(cols, histo)
+  boxhl <- list(boxl, histl)
 
-  boxl <- list(box_patch, histo_patch)
+  message(paste0("Number of quantitative variables = ", n_num))
+  message(paste0("Number of qualitative  variables = ", n_char))
 
-  list(plots = boxl,
-       taildata = taildata,
+  structure(
+  list(plots = boxhl,
+       taildata = outliers,
        n_char = n_char,
        n_num = n_num,
        df_num = df_num,
        df_char = df_char,
-       data = df
-  )
-}
+       data = df),
+  class = "boxhist")
 
+}

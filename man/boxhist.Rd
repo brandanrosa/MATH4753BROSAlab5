@@ -19,5 +19,4 @@ This function takes a df and returns two dfs (one numerical and one categorical)
 }
 \examples{
 \dontrun{boxhist(df = ddt)}
-
 }
