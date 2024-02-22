@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{a list}
 
-\item{which}{which variable to select}
+\item{...}{pass extra options}
 }
 \value{
 a boxplot and histogram

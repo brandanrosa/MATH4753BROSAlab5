@@ -9,7 +9,6 @@
 #' @importFrom ggplot2 ggplot geom_histogram geom_boxplot layer_data aes
 #' @importFrom dplyr select select_if %>%
 #' @importFrom graphics boxplot
-#' @importFrom patchwork /
 #'
 #' @return two dfs and plots
 #' @export
@@ -45,25 +44,40 @@ boxhist <- function(df, ...) {
   box_dat <- boxplot(df_num, plot = FALSE)
   outliers <- box_dat$out
 
+  # DF NEW
+
   # Plots
+  boxx <- function(x){
+    ggplot(df_num) + geom_boxplot(df_num, mapping = aes(x = .data[[x]]))
+  }
+
+  histt <- function(x){
+    ggplot(df_num) + geom_histogram(df_num, mapping = aes(x = .data[[x]]))
+  }
+
   col <- names(df_num[c(1:n_num)])
 
-  boxhl <- lapply(col, function(x) ((df_num %>%
-                                       ggplot() + geom_boxplot(aes(x = .data[[x]])))
-                                    /(df_num %>%
-                                        ggplot() +
-                                        geom_histogram(aes(.data[[x]])))))
+  boxl <- lapply(col, boxx)
+  histl <- lapply(col, histt)
 
-  message(paste0("Number of quantitative variables = ", n_num))
-  message(paste0("Number of qualitative  variables = ", n_char))
+  requireNamespace(patchwork)
 
-  structure(
+  patch1 <- boxl[[1]] / histl[[1]]
+
+  patch2 <- boxl[[2]] / histl[[2]]
+
+  patch3 <-  boxl[[3]] / histl[[3]]
+
+  patch4 <- boxl[[4]] / histl[[4]]
+
+  boxhl <- list(patch1, patch2, patch3, patch4)
+
   list(plots = boxhl,
        taildata = outliers,
        n_char = n_char,
        n_num = n_num,
        df_num = df_num,
        df_char = df_char,
-       data = df),
-  class = "boxhist")
+       data = df
+  )
 }
